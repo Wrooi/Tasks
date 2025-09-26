@@ -1,5 +1,7 @@
 package se.edu.streamdemo;
 
+import static java.util.stream.Collectors.toList;
+
 import se.edu.streamdemo.data.Datamanager;
 import se.edu.streamdemo.task.Deadline;
 import se.edu.streamdemo.task.Task;
@@ -17,9 +19,13 @@ public class Main {
 
         System.out.println("Printing deadlines ...");
         printDeadlines(tasksData);
+        System.out.println("===============================");
+        printDeadLinesUsingStream(tasksData);
 
         System.out.println("Total number of deadlines: " + countDeadlines(tasksData));
 
+        ArrayList<Task> filteredList = filterByStringUsingStream(tasksData, "11");
+        printAllData(filteredList);
     }
 
     private static int countDeadlines(ArrayList<Task> tasksData) {
@@ -39,11 +45,37 @@ public class Main {
     }
 
     public static void printDeadlines(ArrayList<Task> tasksData) {
+        System.out.println("Printing deadlines using iteration ...");
         for (Task t : tasksData) {
             if (t instanceof Deadline) {
                 System.out.println(t);
             }
         }
+    }
+
+    public static void printDeadLinesUsingStream(ArrayList<Task> tasks) {
+        System.out.println("Printing deadlines using stream ...");
+        tasks.stream()
+                .filter((Task t) -> t instanceof Deadline)
+                .sorted((Task t1, Task t2) -> t1.getDescription().compareToIgnoreCase(t2.getDescription()))
+                .forEach(System.out::println);
+    }
+
+    public static ArrayList<Task> filterByString(ArrayList<Task> tasks, String filterString) {
+        ArrayList<Task> filteredList = new ArrayList<>();
+        for (Task t : tasks) {
+            if (t.getDescription().contains(filterString)) {
+                filteredList.add(t);
+            }
+        }
+        return filteredList;
+    }
+
+    public static ArrayList<Task> filterByStringUsingStream(ArrayList<Task> tasks, String filterString) {
+        ArrayList<Task> filteredList = (ArrayList<Task>) tasks.stream()
+                .filter((Task t) -> t.getDescription().contains(filterString))
+                .collect(toList());
+        return filteredList;
     }
 
 }
